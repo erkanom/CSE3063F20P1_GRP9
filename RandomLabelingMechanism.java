@@ -13,7 +13,7 @@ public class RandomLabelingMechanism extends LabelMechanism {
 
 	@Override
 	public void doLabeling(User[] users) {
-		JsonHelper output = new JsonHelper();
+		
 
 		for (int i = 0; i < dataset.getInstances().size(); i++) {
 			Label[] controlList = new Label[this.dataset.getMaxLabel()];
