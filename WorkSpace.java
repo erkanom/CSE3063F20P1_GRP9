@@ -7,25 +7,23 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.*;
 
-
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
 public class WorkSpace {
 	private Dataset dataset;
 	private int id;
-	private HashMap<String,Map<String, ArrayList<Label>>> logs;
+	private HashMap<String, Map<String, ArrayList<Label>>> logs;
 
-	
 	public WorkSpace(int id) {
 		super();
-		this.logs=new HashMap<>();
+		this.logs = new HashMap<>();
 		this.id = id;
 	}
 
 	public void createFromJson(String jsonFileName) throws FileNotFoundException, IOException, ParseException {
-		HashMap<String,Map<String, ArrayList<Label>>> tempLog = new HashMap<>();
+		HashMap<String, Map<String, ArrayList<Label>>> tempLog = new HashMap<>();
 		JSONParser jsonParser = new JSONParser();
 
 		FileReader reader = new FileReader("./" + jsonFileName);
@@ -51,10 +49,9 @@ public class WorkSpace {
 			long labelID = (long) classLabel.get("label id");
 			String labelText = (String) classLabel.get("label text");
 
-			Label tempLabel=new Label((int) labelID, labelText);
-			
+			Label tempLabel = new Label((int) labelID, labelText);
+
 			this.dataset.addLabel(tempLabel);
-		
 
 		}
 
@@ -69,20 +66,17 @@ public class WorkSpace {
 
 //			System.out.println("id:" + id);
 //			System.out.println("instance:" + instanceText);
-			Instance tempInstance=new Instance((int) id, instanceText, (int) maxlabel);
+			Instance tempInstance = new Instance((int) id, instanceText, (int) maxlabel);
 			this.dataset.addInstance(tempInstance);
-			
-			ArrayList<Label> tempLabel= new ArrayList<>();
-			HashMap<String, ArrayList<Label>> tempMap = new HashMap<>();
-			tempLog.put("instance"+id, tempMap);
-			
-					
 
-			
+			ArrayList<Label> tempLabel = new ArrayList<>();
+			HashMap<String, ArrayList<Label>> tempMap = new HashMap<>();
+			tempLog.put("instance" + id, tempMap);
+
 		}
-			this.logs=tempLog;
+		this.logs = tempLog;
 		int x = 0;
-		
+
 	}
 
 	public void CreateJsonFromDataset() {
@@ -112,9 +106,5 @@ public class WorkSpace {
 	public void setLogs(HashMap<String, Map<String, ArrayList<Label>>> logs) {
 		this.logs = logs;
 	}
-
-	
-
-	
 
 }

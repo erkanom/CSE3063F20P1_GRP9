@@ -4,13 +4,13 @@ public class Instance {
 	private String instanceText;
 	private int maxLabel;
 	private int labelCount;
-	
-	public Instance(int instanceId, String labelText,int maxLabel) {
+
+	public Instance(int instanceId, String instanceText, int maxLabel) {
 		super();
 		this.instanceId = instanceId;
-		this.instanceText = labelText;
-		this.maxLabel=maxLabel;
-		this.labelCount=0;
+		this.instanceText = instanceText;
+		this.maxLabel = maxLabel;
+		this.labelCount = 0;
 	}
 
 	public int getInstanceId() {
@@ -52,7 +52,5 @@ public class Instance {
 	public void setLabelCount(int labelCount) {
 		this.labelCount = labelCount;
 	}
-	
-	
-	
+
 }

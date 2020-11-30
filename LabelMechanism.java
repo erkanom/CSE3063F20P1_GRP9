@@ -11,6 +11,6 @@ public abstract class LabelMechanism {
 		// TODO Auto-generated method stub
 		
 	}
-
+	
 	
 }

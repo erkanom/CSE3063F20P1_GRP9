@@ -1,26 +1,19 @@
- 
 
-public class User{
+public class User {
 	private int id;
 	private String name;
 	private String userType;
 	private LabelMechanism mechanism;
 	private WorkSpace workSpace;
-	
+
 	public User(int id, String name, String userType) {
-		this.id=id;
-		this.name=name;
-		this.userType=userType;
-		if(userType.contentEquals("RandomBot")) {
-		mechanism=new RandomLabelingMechanism();
+		this.id = id;
+		this.name = name;
+		this.userType = userType;
+		if (userType.contentEquals("RandomBot")) {
+			mechanism = new RandomLabelingMechanism();
 		}
-		
-	}
-	
-	public void customs() {
-		System.out.println("what is your id");
-		System.out.println("what is your name");
-		System.out.println("what is your userType");
+
 	}
 
 	public int getId() {

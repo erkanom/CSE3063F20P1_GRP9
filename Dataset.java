@@ -1,66 +1,70 @@
 import java.util.ArrayList;
 
 public class Dataset {
-	
+
 	private int datasetId;
 	private String datasetName;
 	private int maxLabel;
-	 
-	private ArrayList <Label> labels = new ArrayList<Label>();
-	 private ArrayList <Instance> instances = new ArrayList<Instance>();
+	private String instanceType;
 
-public Dataset(int datasetId, String datasetName, int maxLabel) {
-	super();
-	this.datasetId = datasetId;
-	this.datasetName = datasetName;
-	this.maxLabel = maxLabel;
-}
+	private ArrayList<Label> labels = new ArrayList<Label>();
+	private ArrayList<Instance> instances = new ArrayList<Instance>();
 
-public int getDatasetId() {
-	return datasetId;
-}
+	public Dataset(int datasetId, String instanceType, String datasetName, int maxLabel) {
+		super();
+		this.datasetId = datasetId;
+		this.instanceType = instanceType;
+		this.datasetName = datasetName;
+		this.maxLabel = maxLabel;
+	}
 
-public void setDatasetId(int datasetId) {
-	this.datasetId = datasetId;
-}
+	public int getDatasetId() {
+		return datasetId;
+	}
 
-public String getDatasetName() {
-	return datasetName;
-}
+	public void setDatasetId(int datasetId) {
+		this.datasetId = datasetId;
+	}
 
-public void setDatasetName(String datasetName) {
-	this.datasetName = datasetName;
-}
+	public String getDatasetName() {
+		return datasetName;
+	}
 
-public int getMaxLabel() {
-	return maxLabel;
-}
+	public void setDatasetName(String datasetName) {
+		this.datasetName = datasetName;
+	}
 
-public void setMaxLabel(int maxLabel) {
-	this.maxLabel = maxLabel;
-}
+	public int getMaxLabel() {
+		return maxLabel;
+	}
 
-public void addInstance(Instance instance) {
-	this.instances.add(instance);
-	
-}
-public void addLabel(Label label) {
-	this.labels.add(label);
-}
-public ArrayList<Label> getLabels() {
-	return labels;
-}
+	public void setMaxLabel(int maxLabel) {
+		this.maxLabel = maxLabel;
+	}
 
-public void setLabels(ArrayList<Label> labels) {
-	this.labels = labels;
-}
+	public void addInstance(Instance instance) {
+		this.instances.add(instance);
 
-public ArrayList<Instance> getInstances() {
-	return instances;
-}
+	}
 
-public void setInstances(ArrayList<Instance> instances) {
-	this.instances = instances;
-}
+	public void addLabel(Label label) {
+		this.labels.add(label);
+	}
+
+	public ArrayList<Label> getLabels() {
+		return labels;
+	}
+
+	public void setLabels(ArrayList<Label> labels) {
+		this.labels = labels;
+	}
+
+	public ArrayList<Instance> getInstances() {
+		return instances;
+	}
+
+	public void setInstances(ArrayList<Instance> instances) {
+		this.instances = instances;
+	}
 
 }

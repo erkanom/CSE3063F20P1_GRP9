@@ -1,83 +1,72 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
 public class RandomLabelingMechanism extends LabelMechanism {
-	private Dataset dataset;
 
-	public RandomLabelingMechanism(Dataset dataset) {
-		super(dataset);
-		this.dataset = super.getDataset();
+	public RandomLabelingMechanism() {
 
 	}
 
 	@Override
-	public void doLabeling(User[] users) {
-		
+	public void doLabeling(WorkSpace workSpace, int userId) {
 
-		for (int i = 0; i < dataset.getInstances().size(); i++) {
-			Label[] controlList = new Label[this.dataset.getMaxLabel()];
-			Arrays.fill(controlList, null);
-			Instance selectedInstance = this.dataset.getInstances().get(i);
+		Random rand = new Random();
 
-			Random userRandomGenerator = new Random();
-			int userRandom = userRandomGenerator.nextInt(users.length);
-			User selectedUser = users[userRandom];
+		int instanceR = rand.nextInt(workSpace.getDataset().getInstances().size()) + 1;
+		int[] labelIds = randomLabelId(workSpace);
 
-			Random instanceMaxLabelRandomGenerator = new Random();
+		if (verifyAndLabel(userId, labelIds, instanceR, workSpace)) {
+			System.out.println("User :" + userId + "\n");
 
-			int instanceMaxLabelRandom = instanceMaxLabelRandomGenerator.nextInt(this.dataset.getMaxLabel());
+		} else {
 
-			int controlListIndex = 0;
-			for (int k = 0; k < instanceMaxLabelRandom; k++) {
-
-				Random labelRandomGenerator = new Random();
-
-				int labelRandom = labelRandomGenerator.nextInt(this.dataset.getLabels().size());
-
-				Label selectedLabel = this.dataset.getLabels().get(labelRandom);
-
-				if (selectedInstance.getLabelCount() < selectedInstance.getMaxLabel()) {
-
-					int controlForAvaiblty = 1;
-					for (int j = 0; j < controlList.length; j++) {
-						if (controlList[j] != null)
-							if (controlList[j].getLabelId() == selectedLabel.getLabelId()) {
-								controlForAvaiblty = 0;
-
-							}
-
-					}
-					int itemCounter = 0;
-					for (int j = 0; j < controlList.length; j++) {
-
-						if (controlList[j] != null) {
-							itemCounter++;
-
-						}
-
-					}
-					if (itemCounter == controlList.length) {
-						controlForAvaiblty = 0;
-					}
-					if (controlForAvaiblty == 1) {
-						controlList[controlListIndex] = selectedLabel;
-						controlListIndex++;
-					}
-
-				}
-
-			}
-			System.out.println("instance: " + selectedInstance.getInstanceId());
-			System.out.println("User : " + selectedUser.getId());
-			for (int j = 0; j < controlList.length; j++) {
-				if (controlList[j] != null)
-					System.out.print("  *" + controlList[j].getLabelId() + "*  \n");
-
-			}
 		}
 
-		;
 	}
 
+	private int[] randomLabelId(WorkSpace workSpace) {
+
+		Random rand = new Random();
+		int labelR = rand.nextInt(workSpace.getDataset().getMaxLabel()) + 1;
+
+		int[] chosed = new int[labelR];
+		int index = 0;
+		for (int i = 0; i < labelR; i++) {
+
+			int choosenLabelId = rand.nextInt(workSpace.getDataset().getLabels().size());
+			boolean control = true;
+			for (int j = 0; j < chosed.length; j++) {
+				if (chosed[j] == choosenLabelId) {
+					control = false;
+				}
+			}
+
+			if (control) {
+				chosed[index] = choosenLabelId;
+			}
+
+		}
+
+		return chosed;
+
+	}
+
+	private boolean verifyAndLabel(int userId, int[] choosenLabels, int instance, WorkSpace workspace) {
+		boolean result = false;
+		if (workspace.getLogs().get("instance" + instance).isEmpty()) {
+			ArrayList<Label> temp = new ArrayList<Label>();
+			for (int i = 0; i < choosenLabels.length; i++) {
+				temp.add(workspace.getDataset().getLabels().get(choosenLabels[i]));
+
+			}
+
+			workspace.getLogs().get("instance" + instance).put("user " + userId, temp);
+			System.out.print("instance: " + instance + " labeled by");
+			result = true;
+
+		}
+		return result;
+	}
+
+	
 }
