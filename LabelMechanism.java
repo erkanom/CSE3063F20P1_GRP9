@@ -1,30 +1,16 @@
 import java.util.ArrayList;
 
 
-public class LabelMechanism {
-
-	private Dataset dataset;
-
-	public LabelMechanism(Dataset dataset) {
-		super();
-
-		this.dataset = dataset;
-	}
+public abstract class LabelMechanism {
 
 	
 
 	
 
-	public Dataset getDataset() {
-		return dataset;
+	public void doLabeling(WorkSpace workSpace,int UserId) {
+		// TODO Auto-generated method stub
+		
 	}
 
-	public void setDataset(Dataset dataset) {
-		this.dataset = dataset;
-	}
-
-	public void doLabeling(User[] user) {
-
-	}
-
+	
 }
