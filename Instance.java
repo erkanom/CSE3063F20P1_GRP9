@@ -21,7 +21,7 @@ public class Instance {
 		this.instanceId = instanceId;
 	}
 
-	public String getLabelText() {
+	public String getinstanceText() {
 		return instanceText;
 	}
 
@@ -37,9 +37,7 @@ public class Instance {
 		this.maxLabel = maxLabel;
 	}
 
-	public String getInstanceText() {
-		return instanceText;
-	}
+	
 
 	public void setInstanceText(String instanceText) {
 		this.instanceText = instanceText;
