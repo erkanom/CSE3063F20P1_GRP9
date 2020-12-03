@@ -62,7 +62,7 @@ public class WorkSpace {
 
 	}
 	public void CreateJsonFromDataset(Object[] objects) throws IOException {
-		Map<String, Object> outputDataset = new LinkedHashMap();
+		JSONObject outputDataset = new JSONObject();
 		JSONArray classLabels = new JSONArray();
 		for (int i = 0; i < dataset.getLabels().size(); i++) {
 			Map m = new LinkedHashMap(2);
@@ -103,19 +103,27 @@ public class WorkSpace {
 			ins.put("user id", userInfo);
 			ins.put("datetime", timeStamp);
 			InstanceLabelConection.add(ins);
-
 		}
+		JSONArray Users = new JSONArray();
+		for (int i = 0; i < objects.length; i++) {
+			Map user = new LinkedHashMap(2);
+			user.put("user id",((User)objects[i]).getId());
+			user.put("user name",((User)objects[i]).getName());
+			user.put("user type",((User)objects[i]).getUserType());
+			Users.add(user);	
+	    }
 		outputDataset.put("dataset id", dataset.getDatasetId());
 		outputDataset.put("dataset name", dataset.getDatasetName());
 		outputDataset.put("maximum number of labels", dataset.getMaxLabel());
 		outputDataset.put("class labels", classLabels);
 		outputDataset.put("instances", classInstances);
 		outputDataset.put("class label assignments", InstanceLabelConection);
-		JSONObject outJson = new JSONObject(outputDataset);
+		outputDataset.put("users", Users);
+		
 		PrintWriter pw;
 		try {
 			pw = new PrintWriter("JSONExample2.json");
-			String output = outJson.toJSONString();
+			String output = outputDataset.toJSONString();
 			output = output.replaceFirst("\\{\"", "\\{\\\n\"");
 			output = output.replaceAll("\\[\\{", "\\[\n\\{");
 			output = output.replaceAll("\\},\\{", "\\},\n\\{");
