@@ -19,13 +19,11 @@ public class WorkSpace {
 	private Dataset dataset;
 	private int id;
 	private HashMap<String, Map<String, ArrayList<Label>>> logs;
-
 	public WorkSpace(int id) {
 		super();
 		this.logs = new HashMap<>();
 		this.id = id;
 	}
-
 	public void createFromJson(String jsonFileName) throws FileNotFoundException, IOException, ParseException {
 		HashMap<String, Map<String, ArrayList<Label>>> tempLog = new HashMap<>();
 		JSONParser jsonParser = new JSONParser();
@@ -44,7 +42,6 @@ public class WorkSpace {
 			String labelText = (String) classLabel.get("label text");
 			Label tempLabel = new Label((int) labelID, labelText);
 			this.dataset.addLabel(tempLabel);
-
 		}
 		JSONArray array1 = (JSONArray) dataset.get("instances");
 		for (int i = 0; i < array1.size(); i++) {
@@ -56,12 +53,10 @@ public class WorkSpace {
 			ArrayList<Label> tempLabel = new ArrayList<>();
 			HashMap<String, ArrayList<Label>> tempMap = new HashMap<>();
 			tempLog.put("instance" + id, tempMap);
-
 		}
 		this.logs = tempLog;
-
 	}
-	public void CreateJsonFromDataset(Object[] objects) throws IOException {
+	public void CreateJsonFromDataset(User[] objects) throws IOException {
 		JSONObject outputDataset = new JSONObject();
 		JSONArray classLabels = new JSONArray();
 		for (int i = 0; i < dataset.getLabels().size(); i++) {
@@ -78,12 +73,10 @@ public class WorkSpace {
 			classInstances.add(ins);
 		}
 		JSONArray InstanceLabelConection = new JSONArray();
-
 		for (int i = 0; i < logs.size(); i++) {
 			Map ins = new LinkedHashMap(2);
 
 			String toTakeSecondOne = "instance" + (i + 1);
-			// String firstOne = "instance id: " + (i + 1);
 			int userInfo = Integer.parseInt(logs.get(toTakeSecondOne).toString().substring(6, 7));
 			String labelInfo = "[";
 
