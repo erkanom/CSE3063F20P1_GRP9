@@ -12,24 +12,18 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.Random;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
 public class ControlCenter {
-
 	private ArrayList<WorkSpace> states;
-
 	public ControlCenter() {
 		super();
 		states = new ArrayList<WorkSpace>();
 	}
-
-	public void StartSystem(String ConfigFileName) throws IOException, ParseException {
+	public void StartSystem(String ConfigFileName) throws Throwable {
 		ArrayList<User> userList = new ArrayList<>();
 		JSONParser jsonParser = new JSONParser();
 		FileReader reader = new FileReader(ConfigFileName + ".json");
@@ -40,12 +34,10 @@ public class ControlCenter {
 		JSONObject datasetsJson = (JSONObject) obj;
 		JSONArray datasetArray = (JSONArray) datasetsJson.get("datasets");
 		JSONArray array = (JSONArray) usersJson.get("users");
-
 		File file = new File("logs.txt");
-		if (file.exists()) {
-			file.delete();
-		} else
-			file.createNewFile();
+		if (!file.exists()) {
+            file.createNewFile();
+        }
 		FileWriter fw = new FileWriter(file, true);
 		BufferedWriter bw = new BufferedWriter(fw);
 		// get user objects in the config file
@@ -56,47 +48,44 @@ public class ControlCenter {
 			String userType = (String) user.get("user type");
 			double consistencyCP = (double) user.get("ConsistencyCheckProbability");
 			userList.add(new User((int) userId, userName, userType, consistencyCP));
-
 			String timeStamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(Calendar.getInstance().getTime());
 			System.out
 					.println(timeStamp + " [ControlCenter] INFO ControlCenter created:" + userName + " as " + userType);
 			bw.write((timeStamp + " [ControlCenter] INFO ControlCenter created:" + userName + " as " + userType));
 			bw.write("\n");
-
 		}
+		bw.close();
 		String currentPath = "";
-
+		ArrayList<String> current=new ArrayList<>();
 		for (int i = 0; i < datasetArray.size(); i++) {
 			JSONObject dataset = (JSONObject) datasetArray.get(i);
 			long datasetId = (long) dataset.get("dataset id");
+			String users = (String) dataset.get("users");
+			String usersInDataset[] = users.split(",");
 			String datasetName = (String) dataset.get("dataset name");
-
 			String datasetFilePath = (String) dataset.get("dataset file path");
 			if (datasetId == currentDatasetId) {
 				currentPath = datasetFilePath;
+				for (int j = 0; j < usersInDataset.length; j++) {
+					current.add(usersInDataset[j]);
+				}
 			} else {
 				states.add(new WorkSpace((int) datasetId));
 				states.get(states.size() - 1).createFromJson("./" + datasetFilePath);
 			}
-
 		}
-
-		bw.close();
 		WorkSpace workSpace = new WorkSpace(0);
 		workSpace.createFromJson("./" + currentPath);
 		getStates(userList, workSpace);
-
 		int userCount = 0;
 		for (int i = 0; i < userList.size(); i++)
-			if (userList.get(i).getUserType().equals("RandomBot"))
+			if (userList.get(i).getUserType().equals("RandomBot")&&current.contains((userList.get(i).getId()+"")))
 				userCount++;
-
+		MetricsHelper metricsHelper = new MetricsHelper(workSpace, states);
 		boolean isSystemHasCapacity = true;
 		while (isSystemHasCapacity) {
-
 			ArrayList<Instance> instanceHasNotCompleted = new ArrayList<Instance>();
 			instanceHasNotCompleted.addAll(workSpace.getDataset().getInstances());
-
 			for (int i = 0; i < workSpace.getDataset().getInstances().size(); i++) {
 				if (workSpace.getLogs().containsKey("instance" + (i + 1))) {
 					LogHistory temp = workSpace.getLogs().get("instance" + (i + 1));
@@ -105,57 +94,59 @@ public class ControlCenter {
 					}
 				}
 			}
-
 			if (instanceHasNotCompleted.isEmpty()) {
 				isSystemHasCapacity = false;
 				break;
 			}
-
 			for (int i = 0; i < userList.size(); i++) {
-
-				if (userList.get(i).getUserType().equals("RandomBot")) {
+				if (userList.get(i).getUserType().equals("RandomBot")&&current.contains((userList.get(i).getId()+""))) {
 					Random rand = new Random();
-					int consis = (int) userList.get(i).getConsistencyCP();
-
+					int consis = (int) (userList.get(i).getConsistencyCP()*100);
 					if (rand.nextInt(100) + 1 > consis) {
 						userList.get(i).getMechanism().doLabeling(workSpace, userList.get(i), instanceHasNotCompleted,
 								true);
+						Thread.sleep(500);
+						metricsHelper.UserMetric(userList);
+						metricsHelper.InstanceMetrics();
+						metricsHelper.DatasetMetric();
 					} else {
 						ArrayList<Instance> temp = new ArrayList<Instance>();
-
 						for (int j = 0; j < instanceHasNotCompleted.size(); j++) {
 							if (workSpace.getLogs()
 									.containsKey("instance" + instanceHasNotCompleted.get(j).getInstanceId())) {
 								LogHistory tempHis = workSpace.getLogs()
 										.get("instance" + instanceHasNotCompleted.get(j).getInstanceId());
 								ArrayList<User> tul = tempHis.getUserList();
-								if (tul.contains(userList.get(i)))
-									;
+								if (tul.contains(userList.get(i)))			
 								temp.add(instanceHasNotCompleted.get(j));
 							}
 						}
-						if (!temp.isEmpty())
+						if (!temp.isEmpty()) {
 							userList.get(i).getMechanism().doLabeling(workSpace, userList.get(i), temp, false);
+							Thread.sleep(500);
+							metricsHelper.UserMetric(userList);
+							metricsHelper.InstanceMetrics();
+							metricsHelper.DatasetMetric();
+						}	
 					}
-
 				}
-
 			}
-
 		}
+		file = new File("logs.txt");
+		if (!file.exists()) {
+            file.createNewFile();
+        }
+		 fw = new FileWriter(file, true);
+		 bw = new BufferedWriter(fw);
+		bw.write("dataset logs for dataset" + currentDatasetId + "\n");
+		bw.close();
 		workSpace.CreateState();
-
-		// User[] obejctList = new User[2];
-		// obejctList[0] = userList.get(0);
-		// obejctList[1] = userList.get(1);
-
-		// workSpace.CreateJsonFromDataset(obejctList);
-
+		metricsHelper.UserMetric(userList);
+		metricsHelper.InstanceMetrics();
+		metricsHelper.DatasetMetric();
 	}
-
 	private void getStates(ArrayList<User> usersListOfAll, WorkSpace current) throws IOException {
 		Path dir = Paths.get("./");
-
 		try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "state*.json")) {
 			for (Path file : stream) {
 				try {
@@ -164,13 +155,11 @@ public class ControlCenter {
 					long datasetId = (long) jo.get("datasetId");
 					long totalInstance = (long) jo.get("totalInstance");
 					JSONArray InstancesArray = (JSONArray) jo.get("Instances");
-
 					for (int i = 0; i < InstancesArray.size(); i++) {
 						JSONObject instanceObject = (JSONObject) InstancesArray.get(i);
 						String Id = (String) instanceObject.get("instanceId");
 						String instanceText = (String) instanceObject.get("instanceText");
 						long finalValue = (long) instanceObject.get("finalValue");
-
 						// user List instance
 						JSONArray temp = (JSONArray) instanceObject.get("userList");
 						JSONObject userListInInstance = (JSONObject) temp.get(0);
@@ -183,14 +172,10 @@ public class ControlCenter {
 						JSONArray temp2 = (JSONArray) instanceObject.get("labels");
 						JSONObject labelListInInstance = (JSONObject) temp2.get(0);
 						String[] labels = new String[labelListInInstance.size()];
-
 						for (int j = 0; j < labels.length; j++) {
 							String value = (String) labelListInInstance.get("value" + (j + 1));
 							labels[j] = value;
 						}
-
-						// [_*15**7**9*, _*15**11**13**12**14**16**7**6*]
-
 						// this for add users to states
 						for (int j = 0; j < states.size(); j++) {
 							// baska dataset burda atiyorum emenike
@@ -198,7 +183,6 @@ public class ControlCenter {
 								HashMap<String, LogHistory> logs = states.get(j).getLogs();
 								LogHistory logHistory = new LogHistory();
 								ArrayList<User> u = new ArrayList<User>();
-
 								for (int k = 0; k < users.length; k++) {
 									u.add(usersListOfAll.get(users[k] - 1));
 								}
@@ -210,8 +194,8 @@ public class ControlCenter {
 									ArrayList<ArrayList<Log>> history = logHistory.getHistory();
 									ArrayList<Log> logList = new ArrayList<>();
 									String[] aloneLabels = cumulativelabel.split("_", -1);
-									ArrayList<Label> ArrayListLabel = new ArrayList<>();
 									for (int l = 0; l < aloneLabels.length; l++) {
+										ArrayList<Label> ArrayListLabel = new ArrayList<>();
 										String aloneLabelsElement = aloneLabels[l];
 										aloneLabelsElement = aloneLabelsElement.replaceFirst("@", "");
 										String[] labelListFinal = aloneLabelsElement.split("@");
@@ -222,26 +206,25 @@ public class ControlCenter {
 										Log tempLog = new Log();
 										tempLog.setLabels(ArrayListLabel);
 										logList.add(tempLog);
-
 									}
 									history.add(logList);
+									logHistory.setInstance(states.get(j).getDataset().getInstances().get(Integer.parseInt(Id)-1));
+									logHistory.setFinalValue(states.get(j).getDataset().getLabels().get((int) (finalValue-1)));
 									logHistory.setHistory(history);
-
 								}
-
 								logs.put("instance" + (Integer.parseInt(Id) + 1), logHistory);
-
 							}
 							if (datasetId == current.getDataset().getDatasetId()) {
 								HashMap<String, LogHistory> logs = current.getLogs();
 								LogHistory logHistory = new LogHistory();
 								ArrayList<User> u = new ArrayList<User>();
-
 								for (int k = 0; k < users.length; k++) {
 									u.add(usersListOfAll.get(users[k] - 1));
 								}
 								logHistory.setUserList(u);
-								
+								if(Id.equals("2")) {
+									int x = 0 ;
+								}
 								// labellari parcala buraya koy
 								for (int k = 0; k < labels.length; k++) {
 									String cumulativelabel = labels[k];
@@ -249,8 +232,8 @@ public class ControlCenter {
 									ArrayList<ArrayList<Log>> history = logHistory.getHistory();
 									ArrayList<Log> logList = new ArrayList<>();
 									String[] aloneLabels = cumulativelabel.split("_", -1);
-									ArrayList<Label> ArrayListLabel = new ArrayList<>();
 									for (int l = 0; l < aloneLabels.length; l++) {
+										ArrayList<Label> ArrayListLabel = new ArrayList<>();
 										String aloneLabelsElement = aloneLabels[l];
 										aloneLabelsElement = aloneLabelsElement.replaceFirst("@", "");
 										String[] labelListFinal = aloneLabelsElement.split("@");
@@ -261,25 +244,16 @@ public class ControlCenter {
 										Log tempLog = new Log();
 										tempLog.setLabels(ArrayListLabel);
 										logList.add(tempLog);
-
 									}
 									history.add(logList);
-									if(Id.equals("11")) {
-										int x = 0 ;
-									}
 									logHistory.setInstance(current.getDataset().getInstances().get(Integer.parseInt(Id)-1));
 									logHistory.setFinalValue(current.getDataset().getLabels().get((int) (finalValue-1)));
-									logHistory.setHistory(history);
-									
+									logHistory.setHistory(history);	
 								}
-								
 								logs.put("instance" + (Integer.parseInt(Id)), logHistory);
-
 							}
 						}
-
 					}
-
 				} catch (FileNotFoundException e) {
 					System.out.println("fileNotFoundControlCenter");
 					return;
@@ -290,9 +264,7 @@ public class ControlCenter {
 					System.out.println("ParseExceptionControlCenter");
 					return;
 				}
-
 			}
 		}
-
 	}
 }
