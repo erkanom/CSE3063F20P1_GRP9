@@ -1,13 +1,14 @@
 {
-"CurrentDatasetId":1,
+"CurrentDatasetId":2,
 "users":[
-{"user id":1, "user name":"RandomLabelingMechanism1","user type":"RandomBot","ConsistencyCheckProbability":0.1},
-{"user id":2, "user name":"RandomLabelingMechanism2","user type":"RandomBot","ConsistencyCheckProbability":0.1},
-{"user id":3, "user name":"MachineLearningLabelingMechanism","user type":"MachineLearningBot","ConsistencyCheckProbability":0.1}
+{"user id":1, "user name":"RandomLabelingMechanism1","user type":"RandomBot","ConsistencyCheckProbability":0.2},
+{"user id":2, "user name":"RandomLabelingMechanism2","user type":"RandomBot","ConsistencyCheckProbability":0.2},
+{"user id":3, "user name":"MachineLearningLabelingMechanism","user type":"MachineLearningBot","ConsistencyCheckProbability":0.1},
+{"user id":4, "user name":"RandomLabelingMechanism4","user type":"RandomBot","ConsistencyCheckProbability":0.1}
 ]
 "datasets":[
-{"dataset id":1,"dataset name":"Sentiment Dataset","dataset file path":"input1.json"}
-{"dataset id":2,"dataset name":"Multilabel Topic Classification Dataset","dataset file path":"input2.json"}
+{"dataset id":1,"dataset name":"Sentiment Dataset","dataset file path":"input1.json","users":"1,2,3"}
+{"dataset id":2,"dataset name":"Sentiment Dataset","dataset file path":"input2.json","users":"1,2,3"}
 ]
 }
 
