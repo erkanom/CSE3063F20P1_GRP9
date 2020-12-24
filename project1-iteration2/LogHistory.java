@@ -33,7 +33,5 @@ public class LogHistory {
 		}
 		public void setHistory(ArrayList<ArrayList<Log>> history) {
 			this.history = history;
-		}
-		
-		
+		}	
 }
