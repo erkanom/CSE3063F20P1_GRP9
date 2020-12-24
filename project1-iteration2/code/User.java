@@ -1,4 +1,3 @@
-
 public class User {
 	private int id;
 	private String name;
@@ -6,7 +5,6 @@ public class User {
 	private LabelMechanism mechanism;
 	private WorkSpace workSpace;
 	private double consistencyCP;
-
 	public User(int id, String name, String userType,double consistencyCP) {
 		this.id = id;
 		this.name = name;
@@ -52,5 +50,4 @@ public class User {
 	public void setConsistencyCP(double consistencyCP) {
 		this.consistencyCP = consistencyCP;
 	}
-
 }
