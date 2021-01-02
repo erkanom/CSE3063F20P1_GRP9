@@ -5,11 +5,14 @@
 {"user id":2, "user name":"RandomLabelingMechanism2","user type":"RandomBot","ConsistencyCheckProbability":0.2,"password":""},
 {"user id":3, "user name":"MachineLearningLabelingMechanism","user type":"MachineLearningBot","ConsistencyCheckProbability":0.1,"password":""},
 {"user id":4, "user name":"RandomLabelingMechanism4","user type":"RandomBot","ConsistencyCheckProbability":0.1,"password":""},
-{"user id":5, "user name":"HumanUser1","user type":"HumanUser","ConsistencyCheckProbability":0.1,"password":"111"}
+{"user id":5, "user name":"HumanUser1","user type":"HumanUser","ConsistencyCheckProbability":0.6,"password":"110"},
+{"user id":6, "user name":"HumanUser2","user type":"HumanUser","ConsistencyCheckProbability":0.1,"password":"110"},
+{"user id":7, "user name":"RatingBot1","user type":"RatingBot","ConsistencyCheckProbability":0.0,"password":"110"},
+{"user id":8, "user name":"EvenBot1","user type":"EvenBot","ConsistencyCheckProbability":0.2,"password":""}
 ]
 "datasets":[
 {"dataset id":1,"dataset name":"Sentiment Dataset","dataset file path":"input1.json","users":"1,2,3,5"},
-{"dataset id":2,"dataset name":"Sentiment Dataset","dataset file path":"input2.json","users":"1,2,3,5"}
+{"dataset id":2,"dataset name":"Sentiment Dataset","dataset file path":"input2.json","users":"1,2,3,5,7,8"}
 ]
 }
 

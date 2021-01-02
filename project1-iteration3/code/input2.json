@@ -1,0 +1,19 @@
+{
+"dataset id":2,
+"dataset name":"Sentiment Dataset",
+"instance type":"document",
+"maximum number of labels per instance":1,
+"class labels":[ {"label id":1,"label text":"Positive"}, {"label id":2,"label text":"Negative"}, {"label id":3,"label text":"Notr"} ],
+"instances":[
+{"id":1, "instance":"T1"},
+{"id":2, "instance":"T2"},
+{"id":3, "instance":"T3"},
+{"id":4, "instance":"T4"},
+{"id":5, "instance":"T5"},
+{"id":6, "instance":"T6"},
+{"id":7, "instance":"T7"},
+{"id":8, "instance":"T8"},
+{"id":9, "instance":"T9"},
+{"id":10, "instance":"T10"}
+]
+}
