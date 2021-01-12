@@ -6,6 +6,7 @@ class Controller(object):
     def __init__(self):
         print("[LOG] Controller Object Created")
         self.studentList=[]
+        self.poolList=[]
 
     #can be improved to getting extra arguments
     def readStudent(self):
@@ -17,7 +18,8 @@ class Controller(object):
             if isinstance(worksheet.cell(row, 1).value,float):
                 self.studentList.append(Student(worksheet.cell(row, 2).value,worksheet.cell(row, 4).value,worksheet.cell(row, 7).value,worksheet.cell(row, 10).value))
 
-
+    def readPools(self):
+        pass
 
 
 
