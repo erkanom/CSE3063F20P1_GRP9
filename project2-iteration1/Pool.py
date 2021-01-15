@@ -1,9 +1,7 @@
 
 class Pool(object):
-
-
-    def __init__(self):
-        self.poolName
+    def __init__(self,poolName):
+        self.poolName=poolName
         self.questionList=[]
         self.answerList=[]
 
