@@ -5,7 +5,7 @@ from Student import Student
 from csv import reader
 from Tr_Cap import tr_upper
 from fuzzywuzzy import fuzz
-from answer import  answer
+from answer import answer
 
 
 class Controller(object):
@@ -29,7 +29,38 @@ class Controller(object):
                             worksheet.cell(row, 10).value))
 
     def readPools(self):
-        pass
+        stListCopy = self.studentList.copy()
+        for t in stListCopy:
+            if isinstance(t, Student):
+                fullName = t.getStudentFullName()
+                fullName = self.tChar(fullName)
+                t.setStudentFullName(fullName)
+                firstName = t.getStudentFirstName()
+                firstName = self.tChar(firstName)
+                t.setStudentFirstName(firstName)
+                LastName = t.getStudentLastName()
+                LastName = self.tChar(LastName)
+                t.setStudentLastName(LastName)
+        with open('./POOLS/CSE3063_20201123_Mon_zoom_PollReport.csv', 'r', encoding='utf-8') as attendance:
+            # pass the file object to reader() to get the reader object
+            attReader = reader(attendance)
+
+            pollStList = []
+            for row in attReader:
+                question=[]
+                studentAnswer=[]
+                if row[4] != "Are you attending this lecture?" and row[4] != "":
+                    studentPollName = row[1]
+                    output = re.sub(r'\d+', '', studentPollName)
+                    output = tr_upper(output)
+                    output = self.tChar(output)
+                    pollStList.append(output)
+                    for x in range(4,len(row)-1):
+                        question.append(row[x])
+                        studentAnswer.append(row[x+1])
+                        x=x+2
+                    pollStList.append([output,question,answer])
+            self.matchName(stListCopy, pollStList)
 
     def readAnswers(self):
 
@@ -60,7 +91,7 @@ class Controller(object):
                 LastName = t.getStudentLastName()
                 LastName = self.tChar(LastName)
                 t.setStudentLastName(LastName)
-        with open('./POOLS/CSE3063_20201124_Tue_zoom_PollReport.csv', 'r', encoding='utf-8') as attendance:
+        with open('./POOLS/CSE3063_20201123_Mon_zoom_PollReport.csv', 'r', encoding='utf-8') as attendance:
             # pass the file object to reader() to get the reader object
             attReader = reader(attendance)
 
@@ -73,18 +104,15 @@ class Controller(object):
                     output = self.tChar(output)
                     pollStList.append(output)
 
-            self.matchName(stListCopy,pollStList)
 
-
-
-
-
+            self.matchName(stListCopy, pollStList)
 
     def startSystem(self):
         self.studentList.clear()
         self.poolList.clear()
         self.readStudent()
         self.readAttendance()
+        self.readPools()
         self.readAnswers()
 
     def tChar(self, fullName):
@@ -96,12 +124,16 @@ class Controller(object):
         fullName = re.sub(r"Ç", "C", fullName)
         return fullName
 
-    def matchName(self,stListCopy,pollStList):
+    def matchName(self, stListCopy, pollStList):
         index = 1
-        tempList=stListCopy.copy()
+        tempList = stListCopy.copy()
         for studentInstance in stListCopy:
             if isinstance(studentInstance, Student):
-                for name in pollStList:
+                for data in pollStList:
+                    if isinstance(data, str):
+                        name = data
+                    else:
+                        name = data[0]
                     Ratio = fuzz.token_set_ratio(studentInstance.getStudentFullName(), name)
                     if Ratio > 70:
                         # print(index, studentInstance.getStudentFullName(), name, Ratio)
