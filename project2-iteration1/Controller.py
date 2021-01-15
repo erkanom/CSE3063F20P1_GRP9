@@ -5,6 +5,7 @@ from Student import Student
 from csv import reader
 from Tr_Cap import tr_upper
 from fuzzywuzzy import fuzz
+import answer
 
 
 class Controller(object):
@@ -12,6 +13,8 @@ class Controller(object):
         print("[LOG] Controller Object Created")
         self.studentList = []
         self.poolList = []
+        self.answerkeyList = []
+        self.poolname = []
 
     # can be improved to getting extra arguments
     def readStudent(self):
@@ -27,6 +30,24 @@ class Controller(object):
 
     def readPools(self):
         pass
+
+    def readAnswers(self):
+
+        with open('answerkey.csv', 'r') as answerfile:
+
+            # taking answer poll by poll
+            answer_read = answerfile.readlines()
+            for row in answer_read:
+                variables = row.split(";")
+
+                if (variables[0].find("CSE3063") != -1):
+                    self.poolname.append(variables[0])
+                    if (len(self.poolname) > 1):
+                        del self.poolname[0]
+                else:
+                    self.answerkeyList.append(answer(self.poolname[0], variables[0], variables[1]))
+        a=0
+
 
     def readAttendance(self):
         stListCopy = self.studentList.copy()

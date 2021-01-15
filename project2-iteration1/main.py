@@ -7,5 +7,6 @@ if __name__ == '__main__':
     studentList = myCont.studentList
     poolList = myCont.poolList
     myCont.readAttendance()
+    myCont.readAnswers()
     ui = UI()
 
