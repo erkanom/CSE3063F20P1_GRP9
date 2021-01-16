@@ -1,3 +1,5 @@
+import difflib
+
 import xlrd
 import re
 import os
@@ -7,16 +9,14 @@ from csv import reader
 from Tr_Cap import tr_upper
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
-from answer import answer
+from AnswerKey import AnswerKey
 
 
 class Controller(object):
     def __init__(self):
         print("[LOG] Controller Object Created")
         self.studentList = []
-
         self.answerkeyList = []
-        self.poolname = []
 
     # can be improved to getting extra arguments
     def readStudent(self):
@@ -70,10 +70,10 @@ class Controller(object):
                     output = tr_upper(output)
                     output = self.tChar(output)
 
-                    for x in range(4, len(row) - 1):
+                    for x in range(4, len(row) - 1, 2):
                         question.append(row[x])
                         studentAnswer.append(row[x + 1])
-                        x = x + 2
+
                 kackere = 0
                 for listeElamani in pollStList:
                     beklenenIsim = listeElamani[0]
@@ -86,28 +86,33 @@ class Controller(object):
                     if len(pollStList) > 0:
                         self.matchName(stListCopy, pollStList)
                         pollStList.clear()
-                pollStList.append([output, question, answer])
+                pollStList.append([output, question, studentAnswer])
                 index = index + 1
             if len(pollStList) > 0:
                 self.matchName(stListCopy, pollStList)
         a = 0
 
-    def readAnswers(self):
+    def readAnswers(self, name):
 
-        with open('answerkey.csv', 'r') as answerfile:
+        with open('ANSWERS/' + name, 'r') as answerfile:
 
             # taking answer poll by poll
-            answer_read = answerfile.readlines()
-            for row in answer_read:
-                # a;b   a;b;c;d     e
-                variables = row.split(";")
 
-                if (variables[0].find("CSE3063") != -1):
-                    self.poolname.append(variables[0])
-                    if (len(self.poolname) > 1):
-                        del self.poolname[0]
-                else:
-                    self.answerkeyList.append(answer(self.poolname[0], variables[0], variables[1]))
+            gir = 1
+            question = []
+            answer = []
+            olnolur = reader(answerfile)
+            for row in olnolur:
+                # getting first eleman as pollName
+                if gir == 1:
+                    pollName = row[0]
+                    gir = 0
+                    continue
+
+                question.append(row[0])
+                answer.append(row[1])
+        answerObject = AnswerKey(pollName, question, answer)
+        self.answerkeyList.append(answerObject)
 
     def readAttendance(self, name):
         stListCopy = self.studentList.copy()
@@ -137,26 +142,29 @@ class Controller(object):
                     output = re.sub(r'\d+', '', studentPollName)
                     output = tr_upper(output)
                     output = self.tChar(output)
-                    a=[]
-                    b=[]
+                    a = []
+                    b = []
                     pollStList.append([output, a, b])
-
-
-
-
 
             self.matchName(stListCopy, pollStList)
 
     def startSystem(self):
         self.studentList.clear()
         self.readStudent()
+        self.answerkeyList.clear()
+        folder = "ANSWERS"
+        for i in os.listdir(folder):
+            file = os.path.join(folder, i)
+            if os.path.isfile(file):
+                self.readAnswers(i)
+
         folder = "POOLS"
         for i in os.listdir(folder):
             file = os.path.join(folder, i)
             if os.path.isfile(file):
-                self.readAttendance(i)
+                # self.readAttendance(i)
                 self.readPools(i)
-
+                pass
         # self.readAnswers()
 
     def tChar(self, fullName):
@@ -171,6 +179,7 @@ class Controller(object):
     def matchName(self, stListCopy, pollStList):
         index = 1
         tempList = pollStList.copy()
+        pollNameAndAnswer = self.whichPollMatch(tempList[1][1])
         Bys = stListCopy.copy()
         for studentInstance in Bys:
             if isinstance(studentInstance, Student):
@@ -180,7 +189,7 @@ class Controller(object):
                     else:
                         name = data[0]
 
-                    if name == "HAMIORAK@SOMEMAIL.COM" and studentInstance.getStudentLastName()=="ORAK":
+                    if name == "HAMIORAK@SOMEMAIL.COM" and studentInstance.getStudentLastName() == "ORAK":
                         try:
                             for eleman in tempList:
                                 isimStudent = eleman[0]
@@ -200,7 +209,7 @@ class Controller(object):
                                 isimStudent = eleman[0]
                                 if isimStudent == name:
                                     tempList.remove(eleman)
-                            print(index,"ciktim", studentInstance.getStudentFullName(), name)
+                            print(index, "ciktim", studentInstance.getStudentFullName(), name)
                             ind = Bys.index(studentInstance)
                             Bys[ind] = None
                             index = index + 1
@@ -275,7 +284,20 @@ class Controller(object):
                                     except:
                                         a = 0
 
+    def whichPollMatch(self, questionList):
+        result = []
+        for key in self.answerkeyList:
+            if isinstance(key, AnswerKey):
+                sm = difflib.SequenceMatcher(None, key.questiontext, questionList)
+                ratio=sm.ratio()
+                if sm.ratio() <= 0.90:
+                    continue
+                result.append(key.pollname)
+                result.append(key.answertext)
 
+        return result
+
+    pass
 
 
 pass
