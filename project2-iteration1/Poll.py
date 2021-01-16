@@ -8,8 +8,22 @@ class Poll(object):
         self.date=date
 
 
+
+
+    def getDate(self):
+        return self.date
+
+    def getName(self):
+        return self.poolName
+
     def addQuestion(self,question):
         self.questionList.append(question)
 
     def addAnswer(self,answer):
         self.answerList.append(answer)
+
+    def getstudentAnswer(self):
+        return self.studentAnswer
+
+    def getanswerList(self):
+        return self.answerList

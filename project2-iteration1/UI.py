@@ -38,7 +38,6 @@ class UI(object):
         #self.remote.startSystem()
 
     def pollStatistic(self):
-        top = Toplevel(self.window)
-        top.title('POLL STATISTIC')
+        #self.remote.calculateOutput()
+        pass
 
-        top.mainloop()

@@ -186,7 +186,7 @@ class Controller(object):
                 self.readPools(i)
                 pass
 
-
+        self.calculateOutput()
 
     def tChar(self, fullName):
         fullName = re.sub(r"İ", "I", fullName)
@@ -407,7 +407,7 @@ class Controller(object):
 
         return result
 
-    def calculateOutput(self,students,dates):
-        calculator=CalculatorForPolls(students,dates)
+    def calculateOutput(self):
+        calculator=CalculatorForPolls(self.studentList,self.allDates,self.pollNameList)
         calculator.startCalculations()
 pass
