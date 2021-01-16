@@ -1,5 +1,6 @@
-import difflib
-
+from CalculatorForPolls import CalculatorForPolls
+from LogAttendance import LogAttendance
+from Poll import Poll
 import xlrd
 import re
 import os
@@ -8,7 +9,7 @@ from Student import Student
 from csv import reader
 from Tr_Cap import tr_upper
 from fuzzywuzzy import fuzz
-from fuzzywuzzy import process
+
 from AnswerKey import AnswerKey
 
 
@@ -17,6 +18,8 @@ class Controller(object):
         print("[LOG] Controller Object Created")
         self.studentList = []
         self.answerkeyList = []
+        self.pollNameList = []
+        self.allDates=[]
 
     # can be improved to getting extra arguments
     def readStudent(self):
@@ -44,7 +47,7 @@ class Controller(object):
                 LastName = t.getStudentLastName()
                 LastName = self.tChar(LastName)
                 t.setStudentLastName(LastName)
-        with open('./POOLS/' + name, 'r', encoding='utf-8') as po:
+        with open('./POLLS/' + name, 'r', encoding='utf-8') as po:
             # pass the file object to reader() to get the reader object
             olnolur = reader(po)
             duzeltme = reader(po)
@@ -55,9 +58,16 @@ class Controller(object):
 
             gir = 1
             count = 0
-            index = 0
-            for row in olnolur:
 
+            for row in olnolur:
+                dtxt = row[3]
+                dtxt = dtxt.replace(",", "")
+                dtxt = dtxt.split()
+                datetime_object = datetime.datetime.strptime(dtxt[0], "%b")
+                month_number = datetime_object.month
+                date = datetime.datetime((int)(dtxt[2]), month_number, (int)(dtxt[1]))
+                if self.allDates.count(date)==0:
+                    self.allDates.append(date)
                 if gir == 1:
                     rowText = row[4]
                     gir = 0
@@ -84,17 +94,18 @@ class Controller(object):
                     gir = 1
 
                     if len(pollStList) > 0:
-                        self.matchName(stListCopy, pollStList)
+                        self.matchName(stListCopy, pollStList, date)
                         pollStList.clear()
                 pollStList.append([output, question, studentAnswer])
-                index = index + 1
+
             if len(pollStList) > 0:
-                self.matchName(stListCopy, pollStList)
+                self.matchName(stListCopy, pollStList, date)
+                pollStList.clear()
         a = 0
 
     def readAnswers(self, name):
 
-        with open('ANSWERS/' + name, 'r') as answerfile:
+        with open('ANSWERS/' + name, encoding='utf-8') as answerfile:
 
             # taking answer poll by poll
 
@@ -127,7 +138,7 @@ class Controller(object):
                 LastName = t.getStudentLastName()
                 LastName = self.tChar(LastName)
                 t.setStudentLastName(LastName)
-        with open('./POOLS/' + name, 'r', encoding='utf-8') as attendance:
+        with open('./POLLS/' + name, 'r', encoding='utf-8') as attendance:
             # pass the file object to reader() to get the reader object
             attReader = reader(attendance)
 
@@ -137,6 +148,14 @@ class Controller(object):
             count = 0
             for row in attReader:
 
+                dtxt = row[3]
+                dtxt = dtxt.replace(",", "")
+                dtxt = dtxt.split()
+                datetime_object = datetime.datetime.strptime(dtxt[0], "%b")
+                month_number = datetime_object.month
+                date = datetime.datetime((int)(dtxt[2]), month_number, (int)(dtxt[1]))
+                if self.allDates.count(date)==0:
+                    self.allDates.append(date)
                 if row[4] == "Are you attending this lecture?":
                     studentPollName = row[1]
                     output = re.sub(r'\d+', '', studentPollName)
@@ -146,7 +165,7 @@ class Controller(object):
                     b = []
                     pollStList.append([output, a, b])
 
-            self.matchName(stListCopy, pollStList)
+            self.matchName(stListCopy, pollStList, date)
 
     def startSystem(self):
         self.studentList.clear()
@@ -158,14 +177,16 @@ class Controller(object):
             if os.path.isfile(file):
                 self.readAnswers(i)
 
-        folder = "POOLS"
+        folder = "POLLS"
+        self.allDates.clear()
         for i in os.listdir(folder):
             file = os.path.join(folder, i)
             if os.path.isfile(file):
-                # self.readAttendance(i)
+                self.readAttendance(i)
                 self.readPools(i)
                 pass
-        # self.readAnswers()
+
+
 
     def tChar(self, fullName):
         fullName = re.sub(r"İ", "I", fullName)
@@ -176,10 +197,18 @@ class Controller(object):
         fullName = re.sub(r"Ç", "C", fullName)
         return fullName
 
-    def matchName(self, stListCopy, pollStList):
+    def matchName(self, stListCopy, pollStList, date):
+
         index = 1
+        # 0 for attandance
+        type = 0
+        date = date
         tempList = pollStList.copy()
-        pollNameAndAnswer = self.whichPollMatch(tempList[1][1])
+        pollNameAndAnswer = []
+        if len(tempList) > 1:
+            if len(tempList[1][1]) > 0:
+                pollNameAndAnswer = self.whichPollMatch(tempList[1][1])
+                type = 1
         Bys = stListCopy.copy()
         for studentInstance in Bys:
             if isinstance(studentInstance, Student):
@@ -195,7 +224,14 @@ class Controller(object):
                                 isimStudent = eleman[0]
                                 if isimStudent == name:
                                     tempList.remove(eleman)
-                                    print(index, studentInstance.getStudentFullName(), name)
+                                    if type == 0:
+                                        logAttandance = LogAttendance(date)
+                                        studentInstance.getAttendanceLogs().append(logAttandance)
+                                    else:
+                                        poll = Poll(pollNameAndAnswer[0][0], data[1], pollNameAndAnswer[0][1], data[2],
+                                                    date)
+                                        studentInstance.getPollLog().append(poll)
+                                    # print(index, studentInstance.getStudentFullName(), name)
                             ind = Bys.index(studentInstance)
                             Bys[ind] = None
                             index = index + 1
@@ -209,10 +245,23 @@ class Controller(object):
                                 isimStudent = eleman[0]
                                 if isimStudent == name:
                                     tempList.remove(eleman)
-                            print(index, "ciktim", studentInstance.getStudentFullName(), name)
-                            ind = Bys.index(studentInstance)
-                            Bys[ind] = None
-                            index = index + 1
+                                    if type == 0:
+                                        logAttandance = LogAttendance(date)
+                                        studentInstance.getAttendanceLogs().append(logAttandance)
+                                        # print(index, "ciktim", studentInstance.getStudentFullName(), name)
+
+                                        ind = Bys.index(studentInstance)
+                                        Bys[ind] = None
+                                        index = index + 1
+                                    else:
+                                        poll = Poll(pollNameAndAnswer[0][0], data[1], pollNameAndAnswer[0][1], data[2],
+                                                    date)
+                                        studentInstance.getPollLog().append(poll)
+                                        # print(index, "ciktim", studentInstance.getStudentFullName(), name)
+                                        ind = Bys.index(studentInstance)
+                                        Bys[ind] = None
+                                        index = index + 1
+
                         except:
                             a = 0
                     elif Ratio >= 70:
@@ -230,10 +279,22 @@ class Controller(object):
                                             isimStudent = eleman[0]
                                             if isimStudent == name:
                                                 tempList.remove(eleman)
-                                        print(index, studentInstance.getStudentFullName(), name)
-                                        ind = Bys.index(studentInstance)
-                                        Bys[ind] = None
-                                        index = index + 1
+                                                if type == 0:
+                                                    logAttandance = LogAttendance(date)
+                                                    studentInstance.getAttendanceLogs().append(logAttandance)
+                                                    # print(index, studentInstance.getStudentFullName(), name)
+                                                    ind = Bys.index(studentInstance)
+                                                    Bys[ind] = None
+                                                    index = index + 1
+                                                else:
+                                                    poll = Poll(pollNameAndAnswer[0][0], data[1],
+                                                                pollNameAndAnswer[0][1], data[2], date)
+                                                    studentInstance.getPollLog().append(poll)
+                                                    # print(index, studentInstance.getStudentFullName(), name)
+                                                    ind = Bys.index(studentInstance)
+                                                    Bys[ind] = None
+                                                    index = index + 1
+
                                     except:
                                         a = 0
 
@@ -246,10 +307,22 @@ class Controller(object):
                                             isimStudent = eleman[0]
                                             if isimStudent == name:
                                                 tempList.remove(eleman)
-                                        print(index, studentInstance.getStudentFullName(), name)
-                                        ind = Bys.index(studentInstance)
-                                        Bys[ind] = None
-                                        index = index + 1
+                                                if type == 0:
+                                                    logAttandance = LogAttendance(date)
+                                                    studentInstance.getAttendanceLogs().append(logAttandance)
+                                                    # print(index, studentInstance.getStudentFullName(), name)
+                                                    ind = Bys.index(studentInstance)
+                                                    Bys[ind] = None
+                                                    index = index + 1
+                                                else:
+                                                    poll = Poll(pollNameAndAnswer[0][0], data[1],
+                                                                pollNameAndAnswer[0][1], data[2], date)
+                                                    studentInstance.getPollLog().append(poll)
+                                                    # print(index, studentInstance.getStudentFullName(), name)
+                                                    ind = Bys.index(studentInstance)
+                                                    Bys[ind] = None
+                                                    index = index + 1
+
                                     except:
                                         a = 0
                             if len(last) == 2 and len(full) == 3:
@@ -262,10 +335,22 @@ class Controller(object):
                                             isimStudent = eleman[0]
                                             if isimStudent == name:
                                                 tempList.remove(eleman)
-                                        print(index, studentInstance.getStudentFullName(), name)
-                                        ind = Bys.index(studentInstance)
-                                        Bys[ind] = None
-                                        index = index + 1
+                                                if type == 0:
+                                                    logAttandance = LogAttendance(date)
+                                                    studentInstance.getAttendanceLogs().append(logAttandance)
+                                                    # print(index, studentInstance.getStudentFullName(), name)
+                                                    ind = Bys.index(studentInstance)
+                                                    Bys[ind] = None
+                                                    index = index + 1
+                                                else:
+                                                    poll = Poll(pollNameAndAnswer[0][0], data[1],
+                                                                pollNameAndAnswer[0][1], data[2], date)
+                                                    studentInstance.getPollLog().append(poll)
+                                                    # print(index, studentInstance.getStudentFullName(), name)
+                                                    ind = Bys.index(studentInstance)
+                                                    Bys[ind] = None
+                                                    index = index + 1
+
                                     except:
                                         a = 0
                             if len(last) == 3 and len(full) == 3:
@@ -277,27 +362,52 @@ class Controller(object):
                                             isimStudent = eleman[0]
                                             if isimStudent == name:
                                                 tempList.remove(eleman)
-                                        print(index, studentInstance.getStudentFullName(), name)
-                                        ind = Bys.index(studentInstance)
-                                        Bys[ind] = None
-                                        index = index + 1
+                                                if type == 0:
+                                                    logAttandance = LogAttendance(date)
+                                                    studentInstance.getAttendanceLogs().append(logAttandance)
+                                                    # print(index, studentInstance.getStudentFullName(), name)
+                                                    ind = Bys.index(studentInstance)
+                                                    Bys[ind] = None
+                                                    index = index + 1
+                                                else:
+                                                    poll = Poll(pollNameAndAnswer[0][0], data[1],
+                                                                pollNameAndAnswer[0][1], data[2], date)
+                                                    studentInstance.getPollLog().append(poll)
+                                                    # print(index, studentInstance.getStudentFullName(), name)
+                                                    ind = Bys.index(studentInstance)
+                                                    Bys[ind] = None
+                                                    index = index + 1
+
+
                                     except:
                                         a = 0
 
+    # TODO burda question listesine gore match yapip key icindeki name ile answerler donecek
     def whichPollMatch(self, questionList):
         result = []
         for key in self.answerkeyList:
             if isinstance(key, AnswerKey):
-                sm = difflib.SequenceMatcher(None, key.questiontext, questionList)
-                ratio=sm.ratio()
-                if sm.ratio() <= 0.90:
-                    continue
-                result.append(key.pollname)
-                result.append(key.answertext)
+                correctQ = key.questiontext
+                ratio = 0
+                for index in range(len(correctQ)):
+                    correctQuestion1 = correctQ[index]
+                    asumptionQuestion = questionList[index]
+                    R = fuzz.WRatio(correctQuestion1, asumptionQuestion)
+                    ratio = ratio + R
+                ratio = ratio / len(correctQ)
+
+                if ratio > 90:
+                    if self.pollNameList.count(key.pollname) == 0:
+                        self.pollNameList.append(key.pollname)
+                        result.append([key.pollname, key.answertext])
+                    else:
+                        many = self.pollNameList.count(key.pollname)
+                        result.append([key.pollname + "-" + ((str)(many + 1)), key.answertext])
+                        self.pollNameList.append(key.pollname + "-" + ((str)(many + 1)))
 
         return result
 
-    pass
-
-
+    def calculateOutput(self,students,dates):
+        calculator=CalculatorForPolls(students,dates)
+        calculator.startCalculations()
 pass

@@ -8,9 +8,12 @@ class Student(object):
         self.studentFullName= StudentFirstName+" "+StudentLastName
         self.StudentInformation = StudentInformation
         self.AttendanceLogs=[]
+        self.PollLog=[]
 
     def getAttendanceLogs(self):
             return self.AttendanceLogs
+    def getPollLog(self):
+            return self.PollLog
 
     def getStudentNo(self):
         return self.StudentNO
