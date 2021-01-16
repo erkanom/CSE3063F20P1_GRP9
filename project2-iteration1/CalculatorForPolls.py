@@ -19,6 +19,7 @@ class CalculatorForPolls(object):
         pollExcell = self.opPoll()
         self.calculatePoll(pollExcell)
         self.closePoll(pollExcell)
+        self.analyzePoll()
 
     def calculateAttendance(self):
         if os.path.exists('Attendance.xlsx'):
@@ -75,16 +76,21 @@ class CalculatorForPolls(object):
         workbook.close()
 
     def calculatePoll(self, pollExcell):
-        studentRow = -1
+        studentRow = 0
         for student in self.students:
-            studentRow = studentRow + 1
+
+            if studentRow == 29:
+                a = 0
             row = []
-            gir = 1
-            whoamI = student
+
             if isinstance(student, Student):
                 column = 4
+                row.clear()
+                fakePollNames = self.pollList.copy()
                 if len(student.getPollLog()) > 0:
+
                     for poll in student.getPollLog():
+                        fakePollNames.remove(poll.getName())
                         row.clear()
                         correctQuestion = 0
                         if isinstance(poll, Poll):
@@ -107,9 +113,80 @@ class CalculatorForPolls(object):
                                 for i in range(len(correctAnswer)):
                                     row.append("Girmedi")
 
-                        self.appendEcxell(whoamI, row, poll.getName(), pollExcell, studentRow, column)
+                        self.appendEcxell(student, row, poll.getName(), pollExcell, studentRow, column, correctQuestion)
+                    for fake in range(len(fakePollNames)):
+                        pn = fakePollNames[fake]
+                        row.clear()
+                        row.append("GIRMEDI")
+                        if pn != None:
+                            self.appendEcxell(student, row, pn, pollExcell, studentRow, column, 0)
+                        fakePollNames[fake] = None
 
-        pass
+                for fake in range(len(fakePollNames)):
+                    pn = fakePollNames[fake]
+                    row.clear()
+                    row.append("GIRMEDI")
+                    if pn != None:
+                        self.appendEcxell(student, row, pn, pollExcell, studentRow, column, 0)
+                    fakePollNames[fake] = None
+            studentRow = studentRow + 1
+
+    def analyzePoll(self):
+        for pollName in self.pollList:
+            questions = []
+            distribution = []
+            gir = 1
+            studentCount=0
+            for student in self.students:
+                if isinstance(student, Student):
+                    for poll in student.getPollLog():
+                        if isinstance(poll, Poll):
+                            if poll.getName() == pollName:
+                                questions = poll.getQuestion()
+                                studentAnswer = poll.getstudentAnswer()
+                                correctAnswer = poll.getanswerList()
+                                if gir == 1:
+                                    for i in range(0,len(correctAnswer)):
+                                        distribution.append(0)
+                                    gir = 0
+                                if len(studentAnswer) == len(correctAnswer):
+                                    studentCount=studentCount+1
+                                    for qindex in range(len(poll.getanswerList())):
+
+                                        ratio = fuzz.WRatio(studentAnswer[qindex], correctAnswer[qindex])
+                                        if ratio > 90:
+                                            distribution[qindex] = distribution[qindex] + 1
+            self.graphDisto(pollName, questions, distribution)
+
+    def graphDisto(self,pollName,questions,distribution):
+        workbook = xlsxwriter.Workbook(pollName+'Pie_Qdistro.xlsx')
+        pieS=workbook.add_worksheet()
+        distro=workbook.add_worksheet()
+
+        chart2 = workbook.add_chart({'type': 'pie'})
+        pieS.write(0,0,"Attanded")
+        pieS.write(0,1, "Not Attanded")
+
+        pieS.write_column('A2', "10")
+        pieS.write_column('B2', "20")
+
+
+
+        chart2.add_series({
+            'name': 'Pie sales data',
+            'categories': '=Sheet1!$A$1:$B$1',
+            'values': '=Sheet1!$A$2:$B$2',
+            'points': [
+                {'fill': {'color': '#5ABA10'}},
+                {'fill': {'color': '#FE110E'}},
+
+            ],
+        })
+        chart2.set_title({'name': 'Pie Chart with user defined colors'})
+        pieS.insert_chart('C18', chart2, {'x_offset': 25, 'y_offset': 10})
+        workbook.close()
+
+
 
     def opPoll(self):
         pollExcell = []
@@ -128,7 +205,7 @@ class CalculatorForPolls(object):
         for x in pollExcell:
             x.close()
 
-    def appendEcxell(self, student, row, pollName, pollExcell, studentRow, column):
+    def appendEcxell(self, student, row, pollName, pollExcell, studentRow, column, corA):
 
         pollName = pollName + ".xlsx"
         for x in pollExcell:
@@ -140,3 +217,7 @@ class CalculatorForPolls(object):
                 sheet1.write(studentRow, 3, student.getStudentInformation())
                 for x in range(len(row)):
                     sheet1.write(studentRow, column + x, row[x])
+                if row[0] != "GIRMEDI":
+                    sheet1.write(studentRow, (column + x + 1), len(row))
+                    sheet1.write(studentRow, (column + x + 2), corA.__str__() + "/" + len(row).__str__())
+                    sheet1.write(studentRow, (column + x + 3), (corA / len(row)) * 100)

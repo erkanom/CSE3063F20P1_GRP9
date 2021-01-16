@@ -410,4 +410,4 @@ class Controller(object):
     def calculateOutput(self):
         calculator=CalculatorForPolls(self.studentList,self.allDates,self.pollNameList)
         calculator.startCalculations()
-pass
+

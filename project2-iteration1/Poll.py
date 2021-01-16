@@ -16,6 +16,9 @@ class Poll(object):
     def getName(self):
         return self.poolName
 
+    def getQuestion(self):
+        return self.questionList
+
     def addQuestion(self,question):
         self.questionList.append(question)
 
