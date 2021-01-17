@@ -1,5 +1,5 @@
 import shutil
-
+from Levenshtein import *
 import xlsxwriter
 import os
 from fuzzywuzzy import fuzz
@@ -16,10 +16,13 @@ class CalculatorForPolls(object):
         self.pollList = pollList
 
     def startCalculations(self):
+        print("Attendance start")
         self.calculateAttendance()
         pollExcell = self.opPoll()
+        print("Calculation start")
         self.calculatePoll(pollExcell)
         self.closePoll(pollExcell)
+        print("Analyzing start")
         self.analyzePoll()
 
 
@@ -285,24 +288,25 @@ class CalculatorForPolls(object):
 
         workbook = load_workbook(filename="Global_LOG.xlsx")
         sheet = workbook.active
-        rc=column+2
-        if studentRow>0:
-            for i in range(1,500):
-                if sheet.cell(row=studentRow+1,column=rc+i).value!=None:
-                    rc=rc+1
-                    break
+        rc=column
 
-        print(column,rc)
+        for i in range(1,500,):
+
+            if sheet.cell(row=studentRow+1,column=rc+i).value==None:
+                rc=rc+i
+                break
+
+
         sheet.cell(row=studentRow+1, column=1).value=student.getStudentNo()
         sheet.cell(row=studentRow+1, column=2).value =student.getStudentFirstName()
         sheet.cell(row=studentRow+1, column=3).value =student.getStudentLastName()
         sheet.cell(row=studentRow+1, column=4).value =student.getStudentInformation()
-        sheet.cell(row=studentRow + 1, column=5).value = pollName
+        sheet.cell(row=studentRow + 1, column=rc).value = pollName
         if len(row)>0:
-            sheet.cell(row=studentRow+1,column=rc).value=len(row)
+            sheet.cell(row=studentRow+1,column=rc+1).value=len(row)
         else:
-            print("G")
-        sheet.cell(row=studentRow+1,column=rc+1).value=(corA / len(row)) * 100
+            print("g")
+        sheet.cell(row=studentRow+1,column=rc+2).value="%"+((corA / len(row)) * 100).__str__()
         workbook.save(filename="Global_LOG.xlsx")
 
 

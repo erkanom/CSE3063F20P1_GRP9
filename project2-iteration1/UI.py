@@ -4,6 +4,8 @@ from tkinter import *
 from tkinter import filedialog
 import os
 
+from openpyxl import load_workbook
+
 
 class UI(object):
     def __init__(self, Controller):
@@ -13,11 +15,11 @@ class UI(object):
         self.window.geometry("1200x900")
         self.window.resizable(width=0, height=0)
         self.button_explore = Button(self.window,
-                                text="ADD NEW POLL",
-                                command=(self.addNewPoll))
+                                     text="ADD NEW POLL",
+                                     command=(self.addNewPoll))
         self.statButton = Button(self.window,
-                                text="Poll Stat",
-                                command=(self.pollStatistic))
+                                 text="Poll Stat",
+                                 command=(self.pollStatistic))
 
         self.button_explore.pack()
         self.statButton.pack()
@@ -33,11 +35,11 @@ class UI(object):
                                                           "*.*")))
 
         print(os.getcwd(), filename)
-        #shutil.copy(filename, os.getcwd())
+        shutil.copy(filename, os.getcwd())
 
-        #self.remote.startSystem()
+        self.remote.startSystem()
 
     def pollStatistic(self):
-        #self.remote.calculateOutput()
-        pass
-
+        penc = Toplevel(self.window)
+        penc.title("Pie")
+        penc.mainloop()
