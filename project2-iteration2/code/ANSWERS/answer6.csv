@@ -1,0 +1,6 @@
+﻿Poll 6W4-2 OO,
+"In OO paradigm, data abstractions", Groups together the pieces of data that describe a particular entity
+"OO is an approach to solve problems using a software where all computations are performed in the context of objects. Based on this, in a pure OO programming language which one of the following is NOT likely to be true?",There can be individual functions/methods that does not belong to a class
+The attributes (variables) of an object represent its state,TRUE
+"If you change the value of a public class attribute of an object, state of the object will change",TRUE
+"If you change the value of a private class attribute of an object via a public setter method, state of the object will change",TRUE

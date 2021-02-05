@@ -1,0 +1,11 @@
+﻿Poll 3:W6-3 UML Class,
+If you have following associations with given cardinalities between three classes which of the following will be true? Flat-1---*-LeasingContract-*---*-Tenant,One tenant can rent the same flat multiple times with different leasing contracts.
+A composition (composite aggregation) may express ...,"when a customer is deleted, all his orders are deleted as well (dependency)."
+"How do you model the following situation with a UML class diagram: The car fleet of a car rental contains multiple cars, one car belongs to exactly one car fleet. Fleet----Car",One to many
+A generalization relationship between a subclass and a superclass in Java has the following property,A subclass can only inherit from one superclass.
+How do you model the following situation with a UML class diagram: During one soccer season multiple players participate in multiple games. Each player may score in each game a certain number of goals. Game----Player,Many to many association and Goal as a association class including integer goals attribute
+A class is divided into which of these compartments ?,All of the above
+What is multiplicity for an association?,The multiplicity at the target class end of an association is the number of instances that can be associated with a single instance of source class
+Which among these are the rules to be considered to form UML Class diagrams?,All the above
+Which one is NOT true for UML?,Usually created in testing activities
+"In Unified Modeling Language, diagrams which captures system static structure and provide foundation for other models is called ...",class diagrams

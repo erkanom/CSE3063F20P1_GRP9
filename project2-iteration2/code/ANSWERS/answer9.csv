@@ -1,0 +1,6 @@
+﻿Poll 9:W5-2 OO,
+There are two types of relationships in object oriented programming. Is-a relation and has-a relation. Classes and objects are organized in a large software by using these relations.,TRUE
+Has-a relation is implemented by using inheritance in OO programming.,FALSE
+Is-a relation is implemented by composition in OO programming.,FALSE
+"In inheritance, private methods of the superclass is not included in the subclass.",FALSE
+Account <- SavingsAccount example shows is-a relation. This means that SavingAccount inherits from Account class. In other words Account class is a generalization of SavingsAccount class.,TRUE

@@ -1,0 +1,5 @@
+﻿"W4-3 OO	4 questions",
+"Based on the Java naming convention, which one is a good name for a class ?",UniversityCourse
+"An object variable such as ""Student activeStudent"" may refer to different objects at different points in time",True
+.... variable’s value is shared by all instances of a class,static
+Which one is not a required property of OO languages?,Garbage collection

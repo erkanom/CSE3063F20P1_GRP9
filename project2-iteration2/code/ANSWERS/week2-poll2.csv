@@ -1,0 +1,11 @@
+﻿Poll 2:W4-3 Object Orientation,
+ Which one is not correct for Java?,A class can inherit two classes
+Which one is false ? An abstract class can ...,can be instantiated
+An UML class diagram is ....,has an elliptic shape
+There are two types of relations between classes in object oriented programming. Is-a relation and has-a relation. Inheritance forms is-a relation between subclass and superclass,TRUE
+There are two types of relations between classes in object oriented programming. Is-a relation and has-a relation. Composition forms has-a relation between two classes. Which of the following show has-a relation?,Automobile-Engine
+It is possible to call a private method of the superclass in the public method of the inherited class,FALSE
+It is possible to call a private method of the superclass in the private method of the inherited class,FALSE
+It is possible to call a protected method of the superclass in the public method of the inherited class,TRUE
+It is possible to call a protected method of the superclass in the protected method of the inherited class,TRUE
+It is possible to call a protected method of the superclass in the private method of the inherited class,TRUE

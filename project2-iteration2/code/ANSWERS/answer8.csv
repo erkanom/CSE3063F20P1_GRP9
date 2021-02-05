@@ -1,0 +1,11 @@
+﻿"Poll 8:W5-1 OO	10 questions",
+Which of the the following is not necessary for a system or language to be OO?,Garbage Collection
+Dynamic Binding occurs when decision about which method to run can only be made at run time,True
+Dynamic binding happens when is more than one possible polymorphic method that could be run among the type of the variable and its subclasses,True
+Dynamic binding is directly related to the polymorphism,True
+We need to avoid switch-case / if-else statements to vary between different types. Instead we need to use polymorphism. This will lead to easy maintenance and extension of the code.,True
+For Polymorphism in Java we need to have at least an abstract method in an abstract class and several classes that inherits from this abstract class by implementing the abstract method in different ways.,True
+For Polymorphism in Java we need to have at least an interface and several classes that implements this interface by by providing implementation to the polymorphic method in different ways.,True
+In order to override a method it has to be abstract.,False
+Abstract classes can be instantiated.,True
+You can never instantiate a class that inherits from abstract class,False

@@ -1,0 +1,11 @@
+﻿W8-3 Iteration Artifacts,
+Visibility is the ability of one object to see another to send a message. In order to do that the sender object must have a reference to receiver object,True
+To send a message from one object to another the receiver object must be visible to the sender via a reference,True
+Which one is not one of the visibility types?,Package visibility
+Which of the following is true for attribute visibility ? The .... object have a reference of the ... object as its attribute,sender / receiver
+In parameter visibility an object of receiver class must be a private attribute,False
+In parameter visibility an object of receiver class must be a public attribute,False
+Which one of the visibility types is most common in OO?,Attribute
+Which one of the visibility types is least common in OO?,Global
+Singleton design pattern is used to achieve ... Visibility,Global
+Singleton pattern ensure that a class has only single instance by making the constructor method private/protected and providing a global access point to create or receive the single instance by a static method.,True

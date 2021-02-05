@@ -1,0 +1,11 @@
+﻿W8-2 Iteration Artifacts,
+Usually first iteration implements core functionality. The reason for this is to produce a running software at the end of the iteration so that we can get feedback from users.,True
+High risk requirements are usually left to last iterations of the project in order to avoid delay in the project,False
+Which of the following is FALSE for Domain Model?,Represents software components along with hardware requirements
+In UML class diagram if a attribute or method name is underlined it means that attribute or method is abstract,False
+If a class is abstract it will not have any methods,False
+In UML Class diagram if a class is abstract its name is written in italic or followed by {abstract} keyword,True
+Interfaces do not include attributes.,True
+Which of the following is used for dynamic modeling?,UML sequence diagram
+In static model shows classes on the other dynamic model show objects in UML,True
+In the design phase which UML diagram should be created first?,Class Diagram
